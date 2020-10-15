@@ -18,9 +18,9 @@
 
 class Material {
 private:
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+    glm::vec3 ambient{};
+    glm::vec3 diffuse{};
+    glm::vec3 specular{};
     GLint diffuseTex;
     GLint specularTex;
 
@@ -39,7 +39,7 @@ public:
         this->specularTex = specularTex;
     }
 
-    ~Material() {}
+    ~Material() = default;
 
     //Function
     void sendToShader(Shader &program) {

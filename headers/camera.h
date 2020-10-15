@@ -19,16 +19,16 @@ enum direction {
 
 class Camera {
 private:
-    glm::mat4 ViewMatrix;
+    glm::mat4 ViewMatrix{};
 
     GLfloat movementSpeed;
     GLfloat sensitivity;
 
-    glm::vec3 worldUp;
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 right;
-    glm::vec3 up;
+    glm::vec3 worldUp{};
+    glm::vec3 position{};
+    glm::vec3 front{};
+    glm::vec3 right{};
+    glm::vec3 up{};
 
     GLfloat pitch;
     GLfloat yaw;
@@ -63,10 +63,10 @@ public:
         this->updateCameraVectors();
     }
 
-    ~Camera() {}
+    ~Camera() = default;
 
     //Accessors
-    const glm::mat4 getViewMatrix() {
+    glm::mat4 getViewMatrix() {
         this->updateCameraVectors();
 
         this->ViewMatrix = glm::lookAt(this->position, this->position + this->front, this->up);
@@ -74,7 +74,7 @@ public:
         return this->ViewMatrix;
     }
 
-    const glm::vec3 getPosition() const {
+    glm::vec3 getPosition() const {
         return this->position;
     }
 

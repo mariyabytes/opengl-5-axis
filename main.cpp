@@ -6,13 +6,14 @@ int main() {
               4, 4,
               true);
 
-//    std::cout << "Calculating Depth map..." << std::endl;
-//
+    std::cout << "Calculating Depth map..." << std::endl;
     for (int i = 0; i < 20; i++) {
         game.initialRender();
 
     }
+    std::cout << "\t\t\t\t...Done" << std::endl;
     game.saveDepthMap();
+
     game.swapTorusAndBezier();
     game.calculateNearestPixel();
     // std::cout << game.closestPixel << std::endl;

@@ -12,7 +12,7 @@ private:
     Material *material;
 
 
-    glm::vec3 position;
+    glm::vec3 position{};
 
 public:
     std::vector<Mesh *> meshes;
@@ -53,7 +53,7 @@ public:
                 new Mesh(
                         mesh.data(),
                         mesh.size(),
-                        NULL,
+                        nullptr,
                         0, glm::vec3(0.f)));
 
         for (auto &i : this->meshes) {

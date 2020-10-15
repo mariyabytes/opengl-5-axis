@@ -23,21 +23,21 @@ private:
     std::vector<GLuint> indices;
 
 public:
-    Primitive() {}
+    Primitive() = default;
 
-    virtual ~Primitive() {}
+    virtual ~Primitive() = default;
 
     //Functions
-    void set(const Vertex *vertices,
+    void set(const Vertex *vertexes,
              const unsigned nrOfVertices,
-             const GLuint *indices,
+             const GLuint *indexes,
              const unsigned nrOfIndices) {
         for (size_t i = 0; i < nrOfVertices; i++) {
-            this->vertices.push_back(vertices[i]);
+            this->vertices.push_back(vertexes[i]);
         }
 
         for (size_t i = 0; i < nrOfIndices; i++) {
-            this->indices.push_back(indices[i]);
+            this->indices.push_back(indexes[i]);
         }
     }
 
@@ -45,9 +45,9 @@ public:
 
     inline GLuint *getIndices() { return this->indices.data(); }
 
-    inline const unsigned getNrOfVertices() { return this->vertices.size(); }
+    inline unsigned getNrOfVertices() { return this->vertices.size(); }
 
-    inline const unsigned getNrOfIndices() { return this->indices.size(); }
+    inline unsigned getNrOfIndices() { return this->indices.size(); }
 };
 
 class Triangle : public Primitive {

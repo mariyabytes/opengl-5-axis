@@ -29,16 +29,16 @@ private:
     GLuint *indexArray;
     unsigned nrOfIndices;
 
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
+    GLuint VAO{};
+    GLuint VBO{};
+    GLuint EBO{};
 
-    glm::vec3 position;
-    glm::vec3 origin;
-    glm::vec3 rotation;
-    glm::vec3 scale;
+    glm::vec3 position{};
+    glm::vec3 origin{};
+    glm::vec3 rotation{};
+    glm::vec3 scale{};
 
-    glm::mat4 ModelMatrix;
+    glm::mat4 ModelMatrix{};
 
     void initVAO() {
         //Create VAO
@@ -93,7 +93,7 @@ public:
     Mesh(
             Vertex *vertexArray,
             const unsigned &nrOfVertices,
-            GLuint *indexArray,
+            const GLuint *indexArray,
             const unsigned &nrOfIndices,
             glm::vec3 position = glm::vec3(0.f),
             glm::vec3 origin = glm::vec3(0.f),
@@ -121,7 +121,7 @@ public:
         this->updateModelMatrix();
     }
 
-    Mesh(
+    explicit Mesh(
             Primitive *primitive,
             glm::vec3 position = glm::vec3(0.f),
             glm::vec3 origin = glm::vec3(0.f),
@@ -187,35 +187,35 @@ public:
     //Accessors
 
     //Modifiers
-    void setPosition(const glm::vec3 position) {
-        this->position = position;
+    void setPosition(const glm::vec3 pos) {
+        this->position = pos;
     }
 
-    void setOrigin(const glm::vec3 origin) {
-        this->origin = origin;
+    void setOrigin(const glm::vec3 orig) {
+        this->origin = orig;
     }
 
-    void setRotation(const glm::vec3 rotation) {
-        this->rotation = rotation;
+    void setRotation(const glm::vec3 rot) {
+        this->rotation = rot;
     }
 
     void setScale(const glm::vec3 setScale) {
-        this->scale = scale;
+        this->scale = setScale;
     }
 
     //Functions
 
-    void move(const glm::vec3 position) {
-        this->position += position;
+    void move(const glm::vec3 pos) {
+        this->position += pos;
         this->setOrigin(this->position);
     }
 
-    void rotate(const glm::vec3 rotation) {
-        this->rotation += rotation;
+    void rotate(const glm::vec3 rot) {
+        this->rotation += rot;
     }
 
-    void scaleUp(const glm::vec3 scale) {
-        this->scale += scale;
+    void scaleUp(const glm::vec3 scal) {
+        this->scale += scal;
     }
 
     void update() {
@@ -236,7 +236,7 @@ public:
         if (this->nrOfIndices == 0)
             glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
         else
-            glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, nullptr);
 
         //Cleanup
         glBindVertexArray(0);

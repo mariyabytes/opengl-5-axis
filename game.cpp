@@ -831,7 +831,7 @@ std::vector<Vertex> generateTorus() {
     }
 
     std::vector<Vertex> vertexArray;
-    Vertex tempVertex;
+    Vertex tempVertex{};
     tempVertex.color = glm::vec3(1.f, 0.f, 0.f);
     tempVertex.normal = glm::vec3(1.f);
     tempVertex.texcoord = glm::vec2(0.f, 1.f);

@@ -98,8 +98,6 @@ private:
 
     void initMaterials();
 
-    void initObjectModels();
-
     void initModels();
 
     void initLights();

@@ -37,8 +37,8 @@ static std::vector<Vertex> loadObjFile(const char *filename) {
 
     std::stringstream ss;
     std::ifstream inputFile(filename);
-    std::string currentLine = "";
-    std::string prefix = "";
+    std::string currentLine;
+    std::string prefix;
 
     glm::vec3 temp_vec3;
     glm::vec2 temp_vec2;
@@ -46,7 +46,10 @@ static std::vector<Vertex> loadObjFile(const char *filename) {
 
     if (!inputFile.is_open()) {
         std::cout << "Failed to load obj file : " << filename << std::endl;
-        throw "ERROR::OBJLOADER::COULD_NOT_OPEN_FILE";
+        std::stringstream errorMsg;
+        errorMsg << "ERROR::OBJLOADER::COULD_NOT_OPEN_FILE";
+        std::cout << errorMsg.str();
+        exit(0);
     }
 
     while (std::getline(inputFile, currentLine)) {
