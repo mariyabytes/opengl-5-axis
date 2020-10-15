@@ -1,9 +1,6 @@
 #ifndef OPENGL_5_AXIS_GAME_H
 #define OPENGL_5_AXIS_GAME_H
 
-
-#pragma once
-
 #include "include_libs.h"
 #include "camera.h"
 #include "objectLoader.h"
@@ -56,12 +53,12 @@ private:
     Camera camera;
 
     //Matrices
-    glm::mat4 ViewMatrix;
-    glm::vec3 camPosition;
-    glm::vec3 worldUp;
-    glm::vec3 camFront;
+    glm::mat4 ViewMatrix{};
+    glm::vec3 camPosition{};
+    glm::vec3 worldUp{};
+    glm::vec3 camFront{};
 
-    glm::mat4 ProjectionMatrix;
+    glm::mat4 ProjectionMatrix{};
     float fov;
     float nearPlane;
     float farPlane;
@@ -79,20 +76,20 @@ private:
     std::vector<glm::vec3 *> lights;
 
 
-    GLfloat *smZbuf;   // depth buffer
+    GLfloat *smZbuf{};   // depth buffer
     float iv1, iv2, iv3;
 
     GLfloat *depthPixels;
 
 //Private functions
-    void initGLFW();
+    static void initGLFW();
 
     void initWindow(
             const char *title,
             bool resizable
     );
 
-    void initGLEW(); //AFTER CONTEXT CREATION!!!
+    static void initGLEW(); //AFTER CONTEXT CREATION!!!
     void initOpenGLOptions();
 
     void initMatrices();
@@ -118,6 +115,7 @@ private:
 public:
     long int closestPixel;
     long int surfaceArea;
+    float scaleFactor;
 
 
 //Constructors / Destructors
@@ -149,15 +147,17 @@ public:
 
     void render();
 
+    void initialRender();
+
     void saveDepthMap();
 
     void calculateNearestPixel();
 
-    void removeBezier();
+    void swapTorusAndBezier();
 
     void rotateBezier();
 
-    GLfloat *calculateActualDepth(GLfloat *);
+    static GLfloat *calculateActualDepth(GLfloat *);
 
 //Static functions
     static void framebuffer_resize_callback(GLFWwindow *window, int fbW, int fbH);

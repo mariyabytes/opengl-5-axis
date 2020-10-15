@@ -1,8 +1,6 @@
 #include "headers/game.h"
 
 bool PROJECTION_MODE = true; // ortho = 1, perspective = 0
-int OPENGL_MAJOR = 4;
-int OPENGL_MINOR = 4;
 
 std::vector<Vertex> generateTriangles();
 
@@ -28,7 +26,7 @@ void Game::initWindow(
 
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); MAC OS
 
-    this->window = glfwCreateWindow(this->WINDOW_WIDTH, this->WINDOW_HEIGHT, title, NULL, NULL);
+    this->window = glfwCreateWindow(this->WINDOW_WIDTH, this->WINDOW_HEIGHT, title, nullptr, nullptr);
 
     if (this->window == nullptr) {
         std::cout << "ERROR::GLFW_WINDOW_INIT_FAILED"
@@ -72,7 +70,7 @@ void Game::initOpenGLOptions() {
 
     //Input
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetKeyCallback(window, this->changeRenderMode);
+    glfwSetKeyCallback(window, Game::changeRenderMode);
 }
 
 void Game::initMatrices() {
@@ -81,15 +79,15 @@ void Game::initMatrices() {
 
     this->ProjectionMatrix = glm::mat4(1.f);
     if (PROJECTION_MODE) {
-        this->ProjectionMatrix = glm::ortho(static_cast<float>(-this->framebufferWidth / 100),
-                                            static_cast<float>(this->framebufferWidth / 100),
-                                            static_cast<float>(-this->framebufferHeight / 100),
-                                            static_cast<float>(this->framebufferHeight / 100),
+        this->ProjectionMatrix = glm::ortho(static_cast<float>(-10),
+                                            static_cast<float>(10),
+                                            static_cast<float>(-10),
+                                            static_cast<float>(10),
                                             -100.0f, 100.0f);
     } else {
         this->ProjectionMatrix = glm::perspective(
                 glm::radians(this->fov),
-                static_cast<float>(this->framebufferWidth) / this->framebufferHeight,
+                static_cast<float>(this->framebufferWidth) / static_cast<float>(this->framebufferHeight),
                 this->nearPlane,
                 this->farPlane);
         std::cout << glm::to_string(this->ProjectionMatrix);
@@ -110,76 +108,26 @@ void Game::initObjectModels() {
 }
 
 void Game::initModels() {
-    std::vector<Mesh *> bezierMesh;
 
     std::vector<Mesh *> torusMesh;
-
-    // std::vector<Vertex> mesh = loadObjFile("resources/models/halfToruss.obj");
-    std::vector<Vertex> bezier = generateTriangles();
     std::vector<Vertex> torus = generateTorus();
 
     torusMesh.push_back(
             new Mesh(
                     torus.data(),
                     torus.size(),
-                    NULL,
+                    nullptr,
                     0,
                     glm::vec3(0.f),
                     glm::vec3(0.f),
                     glm::vec3(0.f),
                     glm::vec3(1.f)));
-    bezierMesh.push_back(
-            new Mesh(
-                    bezier.data(),
-                    bezier.size(),
-                    NULL,
-                    0,
-                    glm::vec3(0.f),
-                    glm::vec3(0.f, 0.f, 0.f),
-                    glm::vec3(0.f),
-                    glm::vec3(1.f)));
 
-    // Quad quad = Quad();
-    // bezierMesh.push_back(
-    // 	new Mesh(&quad,  glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f, 0.f, 0.f)));
-    // Cube quad = Cube();
-    // bezierMesh.push_back(
-    // 	new Mesh(&quad, bezier[0].position, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(10.f)));
-
-    // this->models.push_back(new Model(
-    // 	glm::vec3(0.f, 0.f, -20.f),
-    // 	this->materials[0],
-    // 	this->textures[TEX_CONTAINER],
-    // 	this->textures[TEX_CONTAINER_SPECULAR],
-    // 	meshes));
-    this->models.push_back(new Model(
-            glm::vec3(5.f, 5.f, -80.f),
-            this->materials[0],
-            torusMesh));
     this->models.push_back(new Model(
             glm::vec3(0.f, 0.f, -40.f),
             this->materials[0],
-            bezierMesh));
-    // this->models.push_back(new Model(
-    // 	glm::vec3(0.f, 0.f, -3.f),
-    // 	glm::vec3(90.f, 0.f, 0.f),
-    // 	glm::vec3(0.02f),
-    // 	this->materials[0],
-    // 	this->textures[TEX_CONTAINER],
-    // 	this->textures[TEX_CONTAINER_SPECULAR],
-    // 	"resources/models/surface2.obj"));
+            torusMesh));
 
-    // this->models.push_back(new Model(
-    // 	glm::vec3(0.f, -4.f, 0.f),
-    // 	glm::vec3(0.f, 0.f, 0.f),
-    // 	glm::vec3(0.5f),
-    // 	this->materials[0],
-    // 	this->textures[TEX_CONTAINER],
-    // 	this->textures[TEX_CONTAINER_SPECULAR],
-    // 	"resources/models/torus.obj"));
-
-    for (auto *&i : bezierMesh)
-        delete i;
 
     for (auto *&i : torusMesh)
         delete i;
@@ -209,15 +157,15 @@ void Game::updateUniforms() {
     glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
 
     if (PROJECTION_MODE) {
-        this->ProjectionMatrix = glm::ortho(static_cast<float>(-this->framebufferWidth / 5),
-                                            static_cast<float>(this->framebufferWidth / 5),
-                                            static_cast<float>(-this->framebufferHeight / 5),
-                                            static_cast<float>(this->framebufferHeight / 5),
+        this->ProjectionMatrix = glm::ortho(static_cast<float>(-13.5),
+                                            static_cast<float>(13.5),
+                                            static_cast<float>(-13.5),
+                                            static_cast<float>(13.5),
                                             -100.0f, 100.0f);
     } else {
         this->ProjectionMatrix = glm::perspective(
                 glm::radians(this->fov),
-                static_cast<float>(this->framebufferWidth) / this->framebufferHeight,
+                static_cast<float>(this->framebufferWidth) / static_cast<float>(this->framebufferHeight),
                 this->nearPlane,
                 this->farPlane);
     }
@@ -288,16 +236,16 @@ Game::~Game() {
     glfwDestroyWindow(this->window);
     glfwTerminate();
 
-    for (auto & shader : this->shaders)
+    for (auto &shader : this->shaders)
         delete shader;
 
-    for (auto & material : this->materials)
+    for (auto &material : this->materials)
         delete material;
 
     for (auto *&i : this->models)
         delete i;
 
-    for (auto & light : this->lights)
+    for (auto &light : this->lights)
         delete light;
 }
 
@@ -421,19 +369,20 @@ void Game::render() {
         pixels[i] = 200 * (pixels[i]) - 100;
         // pixels[i] = pixels[i] - this->depthPixels[i];
     }
+//    std::cout << "Current value : " << (float)pixels[40000] << std::endl;
 
-    std::cout << "Value: " << pixels[this->closestPixel] - this->depthPixels[this->closestPixel];
-    std::cout << " | Row: " << (this->closestPixel / this->WINDOW_WIDTH) + 1 << " | Column: "
-              << this->closestPixel % this->WINDOW_WIDTH;
-
-    // std::cout << this->surfaceArea << "[" << (float)pixels[0] << ", " << (float)pixels[WINDOW_WIDTH - 1] << ", " << (float)pixels[WINDOW_WIDTH * (WINDOW_HEIGHT)-1] << ", " << (float)pixels[WINDOW_WIDTH * (WINDOW_HEIGHT - 1)] << "]" << std::endl;
-    std::cout << " | X: "
-              << ((this->closestPixel % this->WINDOW_WIDTH) - ((this->WINDOW_WIDTH - this->surfaceArea) / 2)) * 150 /
-                 this->surfaceArea;
-
-    std::cout << " | Y: "
-              << (((this->closestPixel / this->WINDOW_WIDTH) + 1) - ((this->WINDOW_WIDTH - this->surfaceArea) / 2)) *
-                 150 / this->surfaceArea << std::endl;
+//    std::cout << "Value: " << pixels[this->closestPixel] - this->depthPixels[this->closestPixel];
+//    std::cout << " | Row: " << (this->closestPixel / this->WINDOW_WIDTH) + 1 << " | Column: "
+//              << this->closestPixel % this->WINDOW_WIDTH << std::endl;
+//
+//     std::cout  << "[" << (float)pixels[0] << ", " << (float)pixels[WINDOW_WIDTH - 1] << ", " << (float)pixels[WINDOW_WIDTH * (WINDOW_HEIGHT)-1] << ", " << (float)pixels[WINDOW_WIDTH * (WINDOW_HEIGHT - 1)] << "]" << std::endl;
+//    std::cout << " | X: "
+//              << ((this->closestPixel % this->WINDOW_WIDTH) - ((this->WINDOW_WIDTH - this->surfaceArea) / 2)) * 150 /
+//                 this->surfaceArea;
+//
+//    std::cout << " | Y: "
+//              << (((this->closestPixel / this->WINDOW_WIDTH) + 1) - ((this->WINDOW_WIDTH - this->surfaceArea) / 2)) *
+//                 150 / this->surfaceArea << std::endl;
     //End Draw
     glFlush();
 
@@ -456,17 +405,60 @@ void Game::saveDepthMap() {
 
     glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, this->depthPixels);
 
-    long int counter = 0;
-    for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
-        this->depthPixels[i] = 200 * (this->depthPixels[i]) - 100;
-        this->depthPixels[i] != 100 ? counter++ : NULL;
-    }
+    for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++)
+        depthPixels[i] = 200 * (depthPixels[i]) - 100;
 
-    this->surfaceArea = sqrt(counter);
 
-    // std::cout << "Depthmap : [" << (float)this->depthPixels[0] << ", " << (float)this->depthPixels[WINDOW_WIDTH - 1] << ", " << (float)this->depthPixels[WINDOW_WIDTH * (WINDOW_HEIGHT)-1] << ", " << (float)this->depthPixels[WINDOW_WIDTH * (WINDOW_HEIGHT - 1)] << "]" << std::endl;
+    int initial_bottom = WINDOW_WIDTH / 2;
+    int initial_left = (WINDOW_WIDTH) * (WINDOW_HEIGHT / 2);
+    int initial_right = ((WINDOW_WIDTH) * ((WINDOW_HEIGHT / 2) + 1)) - 1;
+    int initial_top = (WINDOW_WIDTH) * (WINDOW_HEIGHT) - WINDOW_WIDTH / 2;
 
+    int top, bottom, left, right;
+
+//    std::cout << initial_bottom << " " << initial_left << " " << initial_right << " " << initial_top << std::endl;
+
+//    std::cout << "Depthmap : [" << (float) this->depthPixels[initial_bottom] << ", "
+//              << (float) this->depthPixels[initial_left] << ", " << (float) this->depthPixels[initial_right] << ", "
+//              << (float) this->depthPixels[initial_top] << "]" << std::endl;
+
+//  Calculate Bottom Distance
+    int current_pixel = initial_bottom;
+
+    while (depthPixels[current_pixel] == 100)
+        current_pixel += WINDOW_WIDTH;
+
+    bottom = current_pixel / WINDOW_WIDTH;
+
+//  Calculate Top Distance
+    current_pixel = initial_top;
+    while (depthPixels[current_pixel] == 100)
+        current_pixel -= WINDOW_WIDTH;
+
+    top = WINDOW_HEIGHT - current_pixel / WINDOW_WIDTH - 1;
+
+//  Calculate Left Distance
+    current_pixel = initial_left;
+
+    while (depthPixels[current_pixel] == 100)
+        current_pixel++;
+
+    left = (current_pixel % WINDOW_WIDTH);
+
+//  Calculate Right Distance
+    current_pixel = initial_right;
+    while (depthPixels[current_pixel] == 100)
+        current_pixel--;
+
+    right = WINDOW_WIDTH - (current_pixel % WINDOW_WIDTH) - 1;
+
+
+    float average = (float) (top + bottom + left + right) / 4;
+    float pixel_radius_outer = (float(WINDOW_WIDTH) / 2) - average;
+    float actual_radius_outer = 6.7f;
+    scaleFactor = pixel_radius_outer / actual_radius_outer;
     //End Draw
+    std::cout << "Coordinate mapping complete. Scale factor : " << scaleFactor << std::endl;
     glFlush();
 
     glBindVertexArray(0);
@@ -507,7 +499,6 @@ void Game::rotateBezier() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-
 void Game::calculateNearestPixel() {
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -522,19 +513,37 @@ void Game::calculateNearestPixel() {
 
     GLfloat pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
     glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
-    int minValue = 10000;
+    float minValue = 10000.f;
     for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
         pixels[i] = 200 * (pixels[i]) - 100;
 
-        if ((pixels[i] != 100) && (pixels[i] - this->depthPixels[i]) < minValue) {
-            minValue = (pixels[i] - this->depthPixels[i]);
-
+        if ((depthPixels[i] != 100) && (pixels[i] - depthPixels[i]) < minValue) {
+            minValue = (pixels[i] - depthPixels[i]);
             this->closestPixel = i;
         }
     }
 
-    std::cout << "The closest pixel is " << this->closestPixel << ", with value " << minValue << std::endl;
-    // std::cout << "[" << (float)this->depthPixels[0] << ", " << (float)this->depthPixels[WINDOW_WIDTH - 1] << ", " << (float)this->depthPixels[WINDOW_WIDTH * (WINDOW_HEIGHT)-1] << ", " << (float)this->depthPixels[WINDOW_WIDTH * (WINDOW_HEIGHT - 1)] << "]" << std::endl;
+
+    long closest_row_cord = (this->closestPixel / WINDOW_WIDTH) + 1;
+    long closest_column_cord = (this->closestPixel % WINDOW_WIDTH);
+
+    if (closest_column_cord < WINDOW_WIDTH / 2) {
+        closest_column_cord = -((WINDOW_WIDTH / 2) - closest_column_cord);
+    } else {
+        closest_column_cord -= WINDOW_WIDTH / 2;
+    }
+
+    if (closest_row_cord < WINDOW_HEIGHT / 2) {
+        closest_row_cord = -((WINDOW_HEIGHT / 2) - closest_row_cord);
+    } else {
+        closest_row_cord -= WINDOW_HEIGHT / 2;
+    }
+
+    float x_coord = (float)closest_column_cord/scaleFactor;
+    float y_coord = (float)closest_row_cord/scaleFactor;
+
+    std::cout << "Torus touched at " << x_coord << ", " << y_coord << std::endl;
+    std::cout << "Z movement required for first point of contact :  " << minValue << std::endl;
 
     //End Draw
     glFlush();
@@ -545,8 +554,29 @@ void Game::calculateNearestPixel() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Game::removeBezier() {
+void Game::swapTorusAndBezier() {
     this->models.pop_back();
+    std::vector<Mesh *> bezierMesh;
+    std::vector<Vertex> bezier = generateTriangles();
+    bezierMesh.push_back(
+            new Mesh(
+                    bezier.data(),
+                    bezier.size(),
+                    nullptr,
+                    0,
+                    glm::vec3(0.f),
+                    glm::vec3(0.f, 0.f, 0.f),
+                    glm::vec3(0.f),
+                    glm::vec3(1.f)));
+
+    this->models.push_back(new Model(
+            glm::vec3(0.f, 0.f, -80.f),
+            this->materials[0],
+            bezierMesh));
+
+    for (auto *&i : bezierMesh)
+        delete i;
+
 }
 
 //Static functions
@@ -579,13 +609,47 @@ void Game::changeRenderMode(GLFWwindow *window, int key, int scancode, int actio
     }
 }
 
+GLfloat *Game::calculateActualDepth(GLfloat *) {
+    return nullptr;
+}
+
+void Game::initialRender() {
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    //Update the uniforms
+    this->updateUniforms();
+
+    //Render models
+    for (auto &i : this->models)
+        i->render(this->shaders[SHADER_CORE_PROGRAM]);
+    glfwSwapBuffers(window);
+
+    GLfloat pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+
+
+    for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
+        pixels[i] = 200 * (pixels[i]) - 100;
+        // pixels[i] = pixels[i] - this->depthPixels[i];
+    }
+
+
+    glFlush();
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 template<typename T>
 std::vector<T> linspace(T a, T b, size_t N) {
     T h = (b - a) / static_cast<T>(N - 1);
     std::vector<T> xs(N);
     typename std::vector<T>::iterator x;
     T val;
-    for (x = xs.begin(), val = a; x != xs.end(); ++x, val += h)
+    for (x = xs.begin(), val = a; x != xs.end(); ++x, val += h) // NOLINT(cert-flp30-c)
         *x = val;
     return xs;
 }
@@ -602,7 +666,7 @@ int binomialCoeff(int n, int k) {
 
 double Bernstein(int i, int n, double u) {
 
-    double *temp = new double[n + 1];
+    auto *temp = new double[n + 1];
 
     for (int j = 0; j <= n; ++j) {
 
@@ -699,7 +763,7 @@ std::vector<Vertex> generateTriangles() {
     // std::cout << triangle_array[index1][index2].x << " " << triangle_array[index1][index2].y << " " << triangle_array[index1][index2].z << std::endl;
 
     std::vector<Vertex> vertexArray;
-    Vertex tempVertex;
+    Vertex tempVertex{};
     tempVertex.color = glm::vec3(1.f);
     tempVertex.normal = glm::vec3(1.f);
     tempVertex.texcoord = glm::vec2(0.f, 1.f);
@@ -729,7 +793,7 @@ std::vector<Vertex> generateTorus() {
     float radius_inner = 6.0f;
     float radius_outer = 6.7f;
     int theta_min = 0;
-    int theta_max = 180;
+    int theta_max = -180;
 
     glm::vec3 wt = glm::vec3(0.f, 0.f, 1.f);
     glm::vec3 ut = glm::vec3(1.f, 0.f, 0.f);

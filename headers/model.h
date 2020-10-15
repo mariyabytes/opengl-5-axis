@@ -1,7 +1,3 @@
-//
-// Created by magnum on 10/15/20.
-//
-
 #ifndef OPENGL_5_AXIS_MODEL_H
 #define OPENGL_5_AXIS_MODEL_H
 
@@ -10,8 +6,8 @@
 #include "shader.h"
 #include "material.h"
 #include "objectLoader.h"
-class Model
-{
+
+class Model {
 private:
     Material *material;
 
@@ -20,26 +16,23 @@ private:
 
 public:
     std::vector<Mesh *> meshes;
-    void updateUniforms()
-    {
+
+    void updateUniforms() {
     }
 
 public:
     Model(
             glm::vec3 position,
             Material *material,
-            std::vector<Mesh *> &meshes)
-    {
+            std::vector<Mesh *> &meshes) {
         this->position = position;
         this->material = material;
 
-        for (auto *i : meshes)
-        {
+        for (auto *i : meshes) {
             this->meshes.push_back(new Mesh(*i));
         }
 
-        for (auto &i : this->meshes)
-        {
+        for (auto &i : this->meshes) {
             i->move(this->position);
             i->setOrigin(this->position);
         }
@@ -50,8 +43,7 @@ public:
             glm::vec3 rotation,
             glm::vec3 scale,
             Material *material,
-            const char *objFile)
-    {
+            const char *objFile) {
         this->position = position;
         this->material = material;
 
@@ -64,8 +56,7 @@ public:
                         NULL,
                         0, glm::vec3(0.f)));
 
-        for (auto &i : this->meshes)
-        {
+        for (auto &i : this->meshes) {
             i->move(this->position);
             i->setOrigin(this->position);
         }
@@ -74,37 +65,31 @@ public:
         this->scaleUp(scale);
     }
 
-    ~Model()
-    {
+    ~Model() {
         for (auto *&i : this->meshes)
             delete i;
     }
 
     //Functions
-    void rotate(const glm::vec3 rotation)
-    {
+    void rotate(const glm::vec3 rotation) {
         for (auto &i : this->meshes)
             i->rotate(rotation);
     }
 
-    void move(const glm::vec3 direction)
-    {
+    void move(const glm::vec3 direction) {
         for (auto &i : this->meshes)
             i->move(direction);
     }
 
-    void scaleUp(const glm::vec3 scale)
-    {
+    void scaleUp(const glm::vec3 scale) {
         for (auto &i : this->meshes)
             i->scaleUp(scale);
     }
 
-    void update()
-    {
+    void update() {
     }
 
-    void render(Shader *shader)
-    {
+    void render(Shader *shader) {
         //Update the uniforms
         this->updateUniforms();
 
@@ -117,8 +102,7 @@ public:
         //Activate texture
 
         //Draw
-        for (auto &i : this->meshes)
-        {
+        for (auto &i : this->meshes) {
             i->render(shader);
         }
     }

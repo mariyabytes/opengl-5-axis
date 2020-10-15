@@ -8,14 +8,13 @@ int main() {
 
 //    std::cout << "Calculating Depth map..." << std::endl;
 //
-//    for (int i = 0; i < 100; i++) {
-//        game.saveDepthMap();
-//    }
+    for (int i = 0; i < 20; i++) {
+        game.initialRender();
 
-//    std::cout << "\t\t\t... done." << std::endl;
-//    game.rotateBezier();
-//    game.removeBezier();
-//    game.calculateNearestPixel();
+    }
+    game.saveDepthMap();
+    game.swapTorusAndBezier();
+    game.calculateNearestPixel();
     // std::cout << game.closestPixel << std::endl;
 
     //MAIN LOOP

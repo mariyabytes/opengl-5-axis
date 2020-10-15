@@ -1,7 +1,3 @@
-//
-// Created by magnum on 10/15/20.
-//
-
 #ifndef OPENGL_5_AXIS_VERTEX_H
 #define OPENGL_5_AXIS_VERTEX_H
 
@@ -10,8 +6,7 @@
 #include <glm/vec3.hpp>
 
 
-struct Vertex
-{
+struct Vertex {
     glm::vec3 position;
     glm::vec3 color;
     glm::vec2 texcoord;
