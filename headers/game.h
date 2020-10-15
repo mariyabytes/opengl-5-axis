@@ -115,14 +115,14 @@ private:
 public:
     long int closestPixel;
     long int surfaceArea;
-    float scaleFactor;
+    float scaleFactor{};
 
 
 //Constructors / Destructors
     Game(
             const char *title,
-            const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
-            const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR,
+            int WINDOW_WIDTH, int WINDOW_HEIGHT,
+            int GL_VERSION_MAJOR, int GL_VERSION_MINOR,
             bool resizable
     );
 
@@ -132,7 +132,7 @@ public:
     int getWindowShouldClose();
 
 //Modifiers
-    void setWindowShouldClose();
+ void setWindowShouldClose();
 
 //Functions
     void updateDt();

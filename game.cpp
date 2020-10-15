@@ -104,9 +104,6 @@ void Game::initMaterials() {
                                            0, 1));
 }
 
-void Game::initObjectModels() {
-}
-
 void Game::initModels() {
 
     std::vector<Mesh *> torusMesh;
@@ -226,7 +223,6 @@ Game::Game(
     this->initMatrices();
     this->initShaders();
     this->initMaterials();
-    this->initObjectModels();
     this->initModels();
     this->initLights();
     this->initUniforms();
@@ -539,11 +535,18 @@ void Game::calculateNearestPixel() {
         closest_row_cord -= WINDOW_HEIGHT / 2;
     }
 
-    float x_coord = (float)closest_column_cord/scaleFactor;
-    float y_coord = (float)closest_row_cord/scaleFactor;
+    float x_coord = (float) closest_column_cord / scaleFactor;
+    float y_coord = (float) closest_row_cord / scaleFactor;
 
     std::cout << "Torus touched at " << x_coord << ", " << y_coord << std::endl;
     std::cout << "Z movement required for first point of contact :  " << minValue << std::endl;
+
+    std::vector<Mesh *> markerMesh;
+    Quad marker = Quad();
+    markerMesh.push_back(new Mesh(&marker));
+    this->models.push_back(new Model(glm::vec3(0.f), this->materials[0], markerMesh));
+
+    this->models.push_back(new Model(glm::vec3(x_coord, y_coord, 0.f), this->materials[0], markerMesh));
 
     //End Draw
     glFlush();
@@ -570,7 +573,7 @@ void Game::swapTorusAndBezier() {
                     glm::vec3(1.f)));
 
     this->models.push_back(new Model(
-            glm::vec3(0.f, 0.f, -80.f),
+            glm::vec3(-5.f, -5.f, -80.f),
             this->materials[0],
             bezierMesh));
 
@@ -690,7 +693,7 @@ double Bernstein(int i, int n, double u) {
 }
 
 std::vector<Vertex> generateTriangles() {
-    int divisions = 51;
+    int divisions = 151;
     double umin = 0.0, umax = 1.0, vmin = 0.0, vmax = 1.0;
 
     int N = 4, M = 4;
