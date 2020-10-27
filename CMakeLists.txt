@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(opengl_5_axis)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(opengl_5_axis main.cpp headers/game.h headers/include_libs.h headers/vertex.h headers/shader.h headers/primitives.h headers/objectLoader.h headers/model.h headers/mesh.h headers/material.h headers/camera.h game.cpp)
 

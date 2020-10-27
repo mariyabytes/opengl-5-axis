@@ -5,8 +5,6 @@
 #include "camera.h"
 #include "objectLoader.h"
 
-//ZOOOOOOOOOOOM IN BEFORE RECORDING!
-
 //ENUMERATIONS
 enum shader_enum {
     SHADER_CORE_PROGRAM = 0
@@ -19,6 +17,12 @@ enum material_enum {
 };
 enum mesh_enum {
     MESH_QUAD = 0
+};
+
+enum currently_visible {
+    BEZIER = 0,
+    TORUS
+
 };
 
 class Game {
@@ -80,6 +84,18 @@ private:
     float iv1, iv2, iv3;
 
     GLfloat *depthPixels;
+
+//    Ortho matrix stuff
+
+    float mat_left;
+    float mat_right;
+    float mat_top;
+    float mat_bottom;
+
+    bool currently_visible;
+
+    Model *bezierModel{};
+    Model *torusModel{};
 
 //Private functions
     static void initGLFW();
