@@ -1,6 +1,7 @@
 #include "headers/game.h"
 
 bool PROJECTION_MODE = true; // ortho = 1, perspective = 0
+bool DISABLE_GL_READ = false;
 
 std::vector<Vertex> generateTriangles();
 
@@ -405,7 +406,11 @@ void Game::saveDepthMap() {
         i->render(this->shaders[SHADER_CORE_PROGRAM]);
     glfwSwapBuffers(window);
 
-    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, this->depthPixels);
+    if (!DISABLE_GL_READ)
+        glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, this->depthPixels);
+    else
+        for (int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
+            this->depthPixels[i] = 0.5;
 
     for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++)
         depthPixels[i] = 200 * (depthPixels[i]) - 100;
@@ -423,36 +428,42 @@ void Game::saveDepthMap() {
 //    std::cout << "Depthmap : [" << (float) this->depthPixels[initial_bottom] << ", "
 //              << (float) this->depthPixels[initial_left] << ", " << (float) this->depthPixels[initial_right] << ", "
 //              << (float) this->depthPixels[initial_top] << "]" << std::endl;
-
+    if (!DISABLE_GL_READ) {
 //  Calculate Bottom Distance
-    int current_pixel = initial_bottom;
+        int current_pixel = initial_bottom;
 
-    while (depthPixels[current_pixel] == 100)
-        current_pixel += WINDOW_WIDTH;
+        while (depthPixels[current_pixel] == 100)
+            current_pixel += WINDOW_WIDTH;
 
-    bottom = current_pixel / WINDOW_WIDTH;
+        bottom = current_pixel / WINDOW_WIDTH;
 
 //  Calculate Top Distance
-    current_pixel = initial_top;
-    while (depthPixels[current_pixel] == 100)
-        current_pixel -= WINDOW_WIDTH;
+        current_pixel = initial_top;
+        while (depthPixels[current_pixel] == 100)
+            current_pixel -= WINDOW_WIDTH;
 
-    top = WINDOW_HEIGHT - current_pixel / WINDOW_WIDTH - 1;
+        top = WINDOW_HEIGHT - current_pixel / WINDOW_WIDTH - 1;
 
 //  Calculate Left Distance
-    current_pixel = initial_left;
+        current_pixel = initial_left;
 
-    while (depthPixels[current_pixel] == 100)
-        current_pixel++;
+        while (depthPixels[current_pixel] == 100)
+            current_pixel++;
 
-    left = (current_pixel % WINDOW_WIDTH);
+        left = (current_pixel % WINDOW_WIDTH);
 
 //  Calculate Right Distance
-    current_pixel = initial_right;
-    while (depthPixels[current_pixel] == 100)
-        current_pixel--;
+        current_pixel = initial_right;
+        while (depthPixels[current_pixel] == 100)
+            current_pixel--;
 
-    right = WINDOW_WIDTH - (current_pixel % WINDOW_WIDTH) - 1;
+        right = WINDOW_WIDTH - (current_pixel % WINDOW_WIDTH) - 1;
+    } else {
+        left = 24;
+        right = 24;
+        bottom = 24;
+        top = 24;
+    }
 
 
     float average = (float) (top + bottom + left + right) / 4;
@@ -514,7 +525,11 @@ void Game::calculateNearestPixel() {
     glfwSwapBuffers(window);
 
     GLfloat pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
-    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+    if (!DISABLE_GL_READ)
+        glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+    else
+        for(int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
+            pixels[i] = 0.8;
     float minValue = 10000.f;
     for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
         pixels[i] = 200 * (pixels[i]) - 100;
@@ -526,9 +541,9 @@ void Game::calculateNearestPixel() {
     }
 
 
-    long closest_row_cord = (this->closestPixel / WINDOW_WIDTH) + 1;
+    long closest_row_cord = long(float(this->closestPixel) / float(WINDOW_WIDTH)) + 1;
     long closest_column_cord = (this->closestPixel % WINDOW_WIDTH);
-
+//    std::cout << closest_column_cord << "|" << closest_row_cord << std::endl;
     if (closest_column_cord < WINDOW_WIDTH / 2) {
         closest_column_cord = -((WINDOW_WIDTH / 2) - closest_column_cord);
     } else {
@@ -566,9 +581,9 @@ void Game::calculateNearestPixel() {
 void Game::swapTorusAndBezier() {
     this->models.pop_back();
 
-    if(currently_visible == TORUS)
+    if (currently_visible == TORUS)
         models.push_back(bezierModel);
-    else if(currently_visible == BEZIER)
+    else if (currently_visible == BEZIER)
         models.push_back(torusModel);
 
     currently_visible = !currently_visible;

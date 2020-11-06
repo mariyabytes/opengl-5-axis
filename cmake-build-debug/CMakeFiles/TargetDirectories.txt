@@ -1,0 +1,3 @@
+/home/magnum/Projects/opengl-5-axis/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/magnum/Projects/opengl-5-axis/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/magnum/Projects/opengl-5-axis/cmake-build-debug/CMakeFiles/openGL.dir

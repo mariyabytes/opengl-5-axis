@@ -177,6 +177,8 @@ public:
     static void framebuffer_resize_callback(GLFWwindow *window, int fbW, int fbH);
 
     static void changeRenderMode(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+    void multpleRenderCalculation();
 };
 
 
