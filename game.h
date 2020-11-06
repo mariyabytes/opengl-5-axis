@@ -1,9 +1,9 @@
 #ifndef OPENGL_5_AXIS_GAME_H
 #define OPENGL_5_AXIS_GAME_H
 
-#include "include_libs.h"
-#include "camera.h"
-#include "objectLoader.h"
+#include "headers/include_libs.h"
+#include "headers/camera.h"
+#include "headers/objectLoader.h"
 
 //ENUMERATIONS
 enum shader_enum {

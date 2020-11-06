@@ -1,4 +1,4 @@
-#include "headers/game.h"
+#include "game.h"
 
 #include <chrono>
 
