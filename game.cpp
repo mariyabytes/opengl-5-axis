@@ -282,11 +282,6 @@ int Game::getWindowShouldClose() {
     return glfwWindowShouldClose(this->window);
 }
 
-//Modifier
-void Game::setWindowShouldClose() {
-    glfwSetWindowShouldClose(this->window, GLFW_TRUE);
-}
-
 //Functions
 void Game::updateDt() {
     this->curTime = static_cast<float>(glfwGetTime());
@@ -295,7 +290,7 @@ void Game::updateDt() {
     this->lastTime = this->curTime;
 }
 
-void Game::updateMouseInput() {
+[[maybe_unused]] void Game::updateMouseInput() {
     glfwGetCursorPos(this->window, &this->mouseX, &this->mouseY);
 
     if (this->firstMouse) {
@@ -480,7 +475,7 @@ void Game::saveDepthMap() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Game::rotateBezier() {
+[[maybe_unused]] void Game::rotateBezier() {
     this->models[1]->rotate(glm::vec3(0.f, -45.f, 0.f));
     this->update();
     glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -590,11 +585,12 @@ void Game::swapTorusAndBezier() {
 }
 
 //Static functions
-void Game::framebuffer_resize_callback(GLFWwindow *window, int fbW, int fbH) {
+void Game::framebuffer_resize_callback([[maybe_unused]] GLFWwindow *window, int fbW, int fbH) {
     glViewport(0, 0, fbW, fbH);
-};
+}
 
-void Game::changeRenderMode(GLFWwindow *window, int key, int scancode, int action, int mods) {
+void Game::changeRenderMode([[maybe_unused]] GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action,
+                            [[maybe_unused]] int mods) {
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
         GLint polygonMode;
         glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
@@ -619,7 +615,7 @@ void Game::changeRenderMode(GLFWwindow *window, int key, int scancode, int actio
     }
 }
 
-GLfloat *Game::calculateActualDepth(GLfloat *) {
+[[maybe_unused]] GLfloat *Game::reCalculateClosestPoint(GLfloat *) {
     return nullptr;
 }
 
@@ -674,31 +670,6 @@ int binomialCoeff(int n, int k) {
            binomialCoeff(n - 1, k);
 }
 
-double Bernstein(int i, int n, double u) {
-
-    auto *temp = new double[n + 1];
-
-    for (int j = 0; j <= n; ++j) {
-
-        temp[j] = 0.0;
-    }
-
-    temp[n - i] = 1.0;
-    double u1 = 1.0 - u;
-
-    for (int k = 1; k <= n; ++k) {
-
-        for (int j = n; j >= k; --j) {
-
-            temp[j] = u1 * temp[j] + u * temp[j - 1];
-        }
-    }
-
-    // std::cout << "B" << i << n << "(" << u << ")"
-    //           << ":" << temp[n];
-    return temp[n];
-}
-
 std::vector<Vertex> generateTriangles() {
     int divisions = 151;
     double umin = 0.0, umax = 1.0, vmin = 0.0, vmax = 1.0;
@@ -739,11 +710,8 @@ std::vector<Vertex> generateTriangles() {
             temp++;
         }
     }
-    // int index1 = 1;
-    // int index2 = 1;
-    // std::cout << finalControlPointList[index1][index2].x << " " << finalControlPointList[index1][index2].y << " " << finalControlPointList[index1][index2].z << std::endl;
 
-    double u = 0, v = 0, b1, b2;
+    double u, v, b1;
     glm::vec3 triangle_array[divisions][divisions];
     glm::vec3 temp_vector;
 
@@ -754,10 +722,6 @@ std::vector<Vertex> generateTriangles() {
             temp_vector = glm::vec3(0.f);
             for (size_t i = 0; i < N; i++) {
                 for (size_t j = 0; j < M; j++) {
-                    // b1 = Bernstein(i,N, u);
-                    // b2 = Bernstein(j, M, v);
-                    // std::cout << std::fixed<< b1*b2 << std::endl;
-
                     b1 = binomialCoeff(N - 1, i) * pow(u, i) * pow((1 - u), (N - 1 - i)) * binomialCoeff(M - 1, j) *
                          pow(v, j) * pow((1 - v), (M - 1 - j));
                     temp_vector += (float) b1 * finalControlPointList[i][j];
@@ -767,10 +731,6 @@ std::vector<Vertex> generateTriangles() {
             triangle_array[i1][j1] = temp_vector;
         }
     }
-
-    int index1 = 0;
-    int index2 = 0;
-    // std::cout << triangle_array[index1][index2].x << " " << triangle_array[index1][index2].y << " " << triangle_array[index1][index2].z << std::endl;
 
     std::vector<Vertex> vertexArray;
     Vertex tempVertex{};
@@ -812,23 +772,23 @@ std::vector<Vertex> generateTorus() {
 
     glm::vec3 ccc;
 
-    int divt = 51, divp = 91;
+    int div_t = 51, div_p = 91;
 
-    std::vector<double> thetaa = linspace((theta_min * M_PI) / 180, (theta_max * M_PI) / 180, divt);
+    std::vector<double> theta_a = linspace((theta_min * M_PI) / 180, (theta_max * M_PI) / 180, div_t);
 
-    double tempTheta = 0;
-    double tempPhi = 0;
-    double tempVar = 0;
-    std::vector<double> phii;
+    double tempTheta;
+    double tempPhi;
 
-    glm::vec3 triangleVerticesArray[divt][divp];
+    std::vector<double> phi_i;
 
-    for (size_t i = 0; i < divt; i++) {
-        tempTheta = thetaa[i];
-        phii = linspace((double) 0, 2 * M_PI, divp);
+    glm::vec3 triangleVerticesArray[div_t][div_p];
 
-        for (size_t j = 0; j < divp; j++) {
-            tempPhi = phii[j];
+    for (size_t i = 0; i < div_t; i++) {
+        tempTheta = theta_a[i];
+        phi_i = linspace((double) 0, 2 * M_PI, div_p);
+
+        for (size_t j = 0; j < div_p; j++) {
+            tempPhi = phi_i[j];
             ccc = ut * (float) ((radius_outer + radius_inner * cos(tempTheta)) * cos(tempPhi)) +
                   vt * (float) ((radius_outer + radius_inner * cos(tempTheta)) * sin(tempPhi)) +
                   wt * (float) (radius_inner * sin(tempTheta)) + tc1;
@@ -843,8 +803,8 @@ std::vector<Vertex> generateTorus() {
     tempVertex.normal = glm::vec3(1.f);
     tempVertex.texcoord = glm::vec2(0.f, 1.f);
 
-    for (size_t i = 0; i < divp - 1; i++) {
-        for (size_t j = 0; j < divt - 1; j++) {
+    for (size_t i = 0; i < div_p - 1; i++) {
+        for (size_t j = 0; j < div_t - 1; j++) {
             tempVertex.position = triangleVerticesArray[j][i];
             vertexArray.push_back(tempVertex);
             tempVertex.position = triangleVerticesArray[j + 1][i];

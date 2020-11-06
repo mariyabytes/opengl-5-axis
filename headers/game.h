@@ -151,7 +151,7 @@ public:
 //Functions
     void updateDt();
 
-    void updateMouseInput();
+    [[maybe_unused]] void updateMouseInput();
 
     void updateKeyboardInput();
 
@@ -169,14 +169,15 @@ public:
 
     void swapTorusAndBezier();
 
-    void rotateBezier();
+    [[maybe_unused]] void rotateBezier();
 
-    static GLfloat *calculateActualDepth(GLfloat *);
+    [[maybe_unused]] static GLfloat *reCalculateClosestPoint(GLfloat *);
 
 //Static functions
-    static void framebuffer_resize_callback(GLFWwindow *window, int fbW, int fbH);
+    static void framebuffer_resize_callback([[maybe_unused]] GLFWwindow *window, int fbW, int fbH);
 
-    static void changeRenderMode(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void changeRenderMode([[maybe_unused]] GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action,
+                                 [[maybe_unused]] int mods);
 
     void multpleRenderCalculation();
 };
