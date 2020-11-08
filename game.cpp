@@ -1,8 +1,8 @@
 #include "game.h"
 #include "headers/generater_functions.h"
-bool PROJECTION_MODE = true; // ortho = 1, perspective = 0
-bool DISABLE_GL_READ = false;
 
+bool PROJECTION_MODE = true; // orthographic = 1, perspective = 0
+bool DISABLE_GL_READ = false;
 
 
 //Private functions
@@ -35,7 +35,7 @@ void Game::initWindow(
 
     glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
     glfwSetFramebufferSizeCallback(window, Game::framebuffer_resize_callback);
-    //IMPORTANT WHITH PERSPECTIVE MATRIX!!!
+    //IMPORTANT WITH PERSPECTIVE MATRIX!!!
 
     //glViewport(0, 0, framebufferWidth, framebufferHeight);
 
@@ -229,15 +229,8 @@ Game::Game(
     this->mouseOffsetY = 0.0;
     this->firstMouse = true;
 
-    this->iv1 = 2 * (this->nearPlane) * (this->farPlane);
-    this->iv2 = this->nearPlane + this->farPlane;
-    this->iv3 = this->farPlane - this->nearPlane;
-
     this->depthPixels = (GLfloat *) malloc(4 * WINDOW_WIDTH * WINDOW_HEIGHT);
     this->closestPixel = 0;
-
-    this->surfaceArea = 0;
-
     this->mat_left = -13.5;
     this->mat_right = 13.5;
     this->mat_bottom = -13.5;
@@ -505,7 +498,7 @@ void Game::saveDepthMap() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Game::calculateNearestPixel() {
+Pixel *Game::calculateNearestPixel() {
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -521,7 +514,7 @@ void Game::calculateNearestPixel() {
     if (!DISABLE_GL_READ)
         glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
     else
-        for(int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
+        for (int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
             pixels[i] = 0.8;
     float minValue = 10000.f;
     for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
@@ -552,9 +545,14 @@ void Game::calculateNearestPixel() {
     float x_coord = (float) closest_column_cord / scaleFactor;
     float y_coord = (float) closest_row_cord / scaleFactor;
 
-    std::cout << "Torus touched at " << x_coord << ", " << y_coord << std::endl;
-    std::cout << "Z movement required for first point of contact :  " << minValue << std::endl;
+    auto *p = new Pixel;
+    p->x_cord = x_coord;
+    p->y_cord = y_coord;
+    p->index = closestPixel;
+    p->depth = minValue;
 
+
+//
 //    std::vector<Mesh *> markerMesh;
 //    Quad marker = Quad();
 //    markerMesh.push_back(new Mesh(&marker));
@@ -569,6 +567,8 @@ void Game::calculateNearestPixel() {
     glUseProgram(0);
     glActiveTexture(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    return p;
 }
 
 void Game::swapTorusAndBezier() {
@@ -645,6 +645,113 @@ void Game::initialRender() {
     glUseProgram(0);
     glActiveTexture(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Game::recalculateDepthMap() {
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    this->updateUniforms();
+
+    for (auto &i : this->models)
+        i->render(this->shaders[SHADER_CORE_PROGRAM]);
+    glfwSwapBuffers(window);
+
+
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, this->depthPixels);
+
+
+    for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++)
+        depthPixels[i] = 200 * (depthPixels[i]) - 100;
+
+
+    glFlush();
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+void Game::setOrthoMatrixBounds(float left, float right, float bottom, float top) {
+    this->mat_left = left;
+    this->mat_right = right;
+    this->mat_bottom = bottom;
+    this->mat_top = top;
+
+    this->updateUniforms();
+}
+
+Pixel *Game::reCalculateNearestPixel() {
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    this->updateUniforms();
+    for (auto &i : this->models)
+        i->render(this->shaders[SHADER_CORE_PROGRAM]);
+    glfwSwapBuffers(window);
+    GLfloat pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
+
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+    float minValue = 10000.f;
+    for (size_t i = 0; i < this->WINDOW_WIDTH * this->WINDOW_HEIGHT; i++) {
+        float a, b;
+
+        pixels[i] = 200 * (pixels[i]) - 100;
+        a = pixels[i];
+        b = depthPixels[i];
+        if ((depthPixels[i] != 100) && (pixels[i] - depthPixels[i]) < minValue) {
+            minValue = (pixels[i] - depthPixels[i]);
+            this->closestPixel = i;
+        }
+    }
+
+    long closest_row_cord = long(float(this->closestPixel) / float(WINDOW_WIDTH)) + 1;
+    long closest_column_cord = (this->closestPixel % WINDOW_WIDTH);
+
+    if (closest_column_cord < WINDOW_WIDTH / 2) {
+        closest_column_cord = -((WINDOW_WIDTH / 2) - closest_column_cord);
+    } else {
+        closest_column_cord -= WINDOW_WIDTH / 2;
+    }
+
+    if (closest_row_cord < WINDOW_HEIGHT / 2) {
+        closest_row_cord = -((WINDOW_HEIGHT / 2) - closest_row_cord);
+    } else {
+        closest_row_cord -= WINDOW_HEIGHT / 2;
+    }
+
+    float x_coord = (float) closest_column_cord / scaleFactor;
+    float y_coord = (float) closest_row_cord / scaleFactor;
+
+    auto *p = new Pixel;
+    p->x_cord = x_coord;
+    p->y_cord = y_coord;
+    p->index = closestPixel;
+    p->depth = minValue;
+
+
+
+//    std::vector<Mesh *> markerMesh;
+//    Quad marker = Quad();
+//    markerMesh.push_back(new Mesh(&marker));
+//    this->models.push_back(new Model(glm::vec3(0.f), this->materials[0], markerMesh));
+//
+//    this->models.push_back(new Model(glm::vec3(x_coord, y_coord, 0.f), this->materials[0], markerMesh));
+
+    //End Draw
+    glFlush();
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return p;
+}
+
+void Game::setNewScaleFactor(float tolerance) {
+    this->scaleFactor = float(WINDOW_WIDTH) / tolerance;
 }
 
 

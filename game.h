@@ -10,19 +10,30 @@ enum shader_enum {
     SHADER_CORE_PROGRAM = 0
 };
 enum texture_enum {
-    TEX_PUSHEEN = 0, TEX_PUSHEEN_SPECULAR, TEX_CONTAINER, TEX_CONTAINER_SPECULAR
+    TEX_PUSHEEN [[maybe_unused]] = 0,
+    TEX_PUSHEEN_SPECULAR [[maybe_unused]],
+    TEX_CONTAINER [[maybe_unused]],
+    TEX_CONTAINER_SPECULAR [[maybe_unused]]
 };
 enum material_enum {
-    MAT_1 = 0
+    MAT_1 [[maybe_unused]] = 0
 };
 enum mesh_enum {
-    MESH_QUAD = 0
+    MESH_QUAD [[maybe_unused]] = 0
 };
 
 enum currently_visible {
     BEZIER = 0,
     TORUS
 
+};
+
+class Pixel {
+public:
+    long int index;
+    float x_cord;
+    float y_cord;
+    float depth;
 };
 
 class Game {
@@ -79,10 +90,6 @@ private:
     //Lights
     std::vector<glm::vec3 *> lights;
 
-
-    GLfloat *smZbuf{};   // depth buffer
-    float iv1, iv2, iv3;
-
     GLfloat *depthPixels;
 
 //    Ortho matrix stuff
@@ -128,7 +135,6 @@ private:
 
 public:
     long int closestPixel;
-    long int surfaceArea;
     float scaleFactor{};
 
 
@@ -146,7 +152,8 @@ public:
     int getWindowShouldClose();
 
 //Modifiers
- void setWindowShouldClose();
+
+    void setOrthoMatrixBounds(float left, float right, float bottom, float top);
 
 //Functions
     void updateDt();
@@ -165,7 +172,7 @@ public:
 
     void saveDepthMap();
 
-    void calculateNearestPixel();
+    Pixel *calculateNearestPixel();
 
     void swapTorusAndBezier();
 
@@ -176,10 +183,16 @@ public:
 //Static functions
     static void framebuffer_resize_callback([[maybe_unused]] GLFWwindow *window, int fbW, int fbH);
 
-    static void changeRenderMode([[maybe_unused]] GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action,
-                                 [[maybe_unused]] int mods);
+    static void
+    changeRenderMode([[maybe_unused]] GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action,
+                     [[maybe_unused]] int mods);
 
-    void multpleRenderCalculation();
+    void recalculateDepthMap();
+
+    Pixel * reCalculateNearestPixel();
+
+    void setNewScaleFactor(float tolerance);
+
 };
 
 

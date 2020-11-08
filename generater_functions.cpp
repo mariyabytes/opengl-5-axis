@@ -75,9 +75,9 @@ std::vector<Vertex> generateTriangles() {
             temp_vector = glm::vec3(0.f);
             for (size_t i = 0; i < N; i++) {
                 for (size_t j = 0; j < M; j++) {
-                    b1 = binomialCoefficient(N - 1, i) * pow(u, i) * pow((1 - u), (N - 1 - i)) *
+                    b1 = binomialCoefficient(N - 1, i) * pow(u, i) * pow((1 - u), double(N - 1 - i)) *
                          binomialCoefficient(M - 1, j) *
-                         pow(v, j) * pow((1 - v), (M - 1 - j));
+                         pow(v, j) * pow((1 - v), double(M - 1 - j));
                     temp_vector += (float) b1 * finalControlPointList[i][j];
                 }
             }
@@ -126,7 +126,7 @@ std::vector<Vertex> generateTorus() {
 
     glm::vec3 ccc;
 
-    int div_t = 51, div_p = 91;
+    int div_t = 150, div_p = 150;
 
     std::vector<double> theta_a = linspace((theta_min * M_PI) / 180, (theta_max * M_PI) / 180, div_t);
 

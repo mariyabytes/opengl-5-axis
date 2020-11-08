@@ -9,12 +9,8 @@ int main() {
               4, 4,
               true);
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++)
         game.initialRender();
-
-    }
-
-
 
     auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Calculating Depth map..." << std::endl;
@@ -24,7 +20,27 @@ int main() {
     std::cout << "\t\t\t\t...Done" << std::endl;
 
     game.swapTorusAndBezier();
-    game.calculateNearestPixel();
+
+    Pixel *p;
+
+    p = game.calculateNearestPixel();
+    std::cout << "Torus touched at " << p->x_cord << ", " << p->y_cord << std::endl;
+    std::cout << "Z movement required for first point of contact :  " << p->depth << std::endl;
+
+    float zoomTolerance = 0.1;
+
+    game.setOrthoMatrixBounds(p->x_cord-zoomTolerance, p->x_cord+zoomTolerance, p->y_cord-zoomTolerance, p->y_cord+zoomTolerance);
+    game.swapTorusAndBezier();
+
+    game.recalculateDepthMap();
+    game.swapTorusAndBezier();
+
+    game.setNewScaleFactor(zoomTolerance);
+
+    Pixel *newP = game.reCalculateNearestPixel();
+
+    std::cout << "[NEW] Torus touched at " << newP->x_cord << ", " << newP->y_cord << std::endl;
+    std::cout << "[NEW] Z movement required for first point of contact :  " << newP->depth << std::endl;
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<std::chrono::microseconds>(stop - start);
